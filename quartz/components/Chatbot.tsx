@@ -54,7 +54,13 @@ export default (() => {
           <div class="chatbot-messages" id="chatbot-messages">
             <div class="chatbot-welcome">
               <div class="chatbot-welcome-avatar">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="36" height="36">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  width="36"
+                  height="36"
+                >
                   <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"></path>
                 </svg>
               </div>
@@ -78,15 +84,24 @@ export default (() => {
                 <span class="chatbot-preset-icon">🎯</span>
                 <span>转专业与保研</span>
               </button>
-              <button class="chatbot-preset-btn" data-question="2024到2025年转专业政策有哪些主要变化？">
+              <button
+                class="chatbot-preset-btn"
+                data-question="2024到2025年转专业政策有哪些主要变化？"
+              >
                 <span class="chatbot-preset-icon">📊</span>
                 <span>近年政策变化速览</span>
               </button>
-              <button class="chatbot-preset-btn" data-question="有哪些学院可以转入？各学院的接收计划是怎样的？">
+              <button
+                class="chatbot-preset-btn"
+                data-question="有哪些学院可以转入？各学院的接收计划是怎样的？"
+              >
                 <span class="chatbot-preset-icon">🏫</span>
                 <span>各学院接收计划</span>
               </button>
-              <button class="chatbot-preset-btn" data-question="转专业考核一般考什么？如何准备笔试和面试？">
+              <button
+                class="chatbot-preset-btn"
+                data-question="转专业考核一般考什么？如何准备笔试和面试？"
+              >
                 <span class="chatbot-preset-icon">📝</span>
                 <span>考核内容与备考</span>
               </button>
@@ -98,18 +113,43 @@ export default (() => {
               <textarea
                 class="chatbot-input"
                 id="chatbot-input"
-                placeholder="向“转专业助手”提问 (Shift+Enter 换行)..."
+                placeholder="输入你的转专业问题，例如：计算机学院笔试考什么？"
                 rows={1}
               ></textarea>
               <div class="chatbot-actions-group">
-                <button class="chatbot-clear" id="chatbot-clear" aria-label="清空对话" title="新对话">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+                <button
+                  class="chatbot-clear"
+                  id="chatbot-clear"
+                  aria-label="清空对话"
+                  title="新对话"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    width="16"
+                    height="16"
+                  >
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                   </svg>
                 </button>
                 <button class="chatbot-send" id="chatbot-send" aria-label="发送">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    width="18"
+                    height="18"
+                  >
                     <line x1="22" y1="2" x2="11" y2="13"></line>
                     <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                   </svg>

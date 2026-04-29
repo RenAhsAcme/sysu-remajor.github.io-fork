@@ -305,7 +305,10 @@ function normalizeText(input: string): string {
 }
 
 function stripMarkupNoise(input: string): string {
-  return input.replace(/\s+/g, " ").replace(/\[[^\]]+\]\([^)]+\)/g, " ").trim()
+  return input
+    .replace(/\s+/g, " ")
+    .replace(/\[[^\]]+\]\([^)]+\)/g, " ")
+    .trim()
 }
 
 function escapeHtml(input: string): string {
@@ -326,7 +329,9 @@ function sourceLabel(sourceType: SourceType): string {
 }
 
 function mergeLimited(current: string[], incoming: string[], limit: number): string[] {
-  return unique([...incoming, ...current]).filter(Boolean).slice(0, limit)
+  return unique([...incoming, ...current])
+    .filter(Boolean)
+    .slice(0, limit)
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -336,7 +341,10 @@ function clamp(value: number, min: number, max: number): number {
 function recentConversationSummary(history: StoredMessage[], limit = 4): string {
   return history
     .slice(-limit)
-    .map((message) => `${message.role === "user" ? "用户" : "助手"}: ${stripMarkupNoise(message.content)}`)
+    .map(
+      (message) =>
+        `${message.role === "user" ? "用户" : "助手"}: ${stripMarkupNoise(message.content)}`,
+    )
     .join("\n")
 }
 
@@ -366,8 +374,9 @@ function isLikelySupplementInput(text: string): boolean {
   if (/^(为什么|怎么|如何|能不能|可不可以|是不是|是什么|多少|几点|几号)/.test(trimmed)) return false
 
   return (
-    /^(20\d{2}|大一|大二|高等数学[一二三上下]?|数学分析|医科数学|计算机学院|计算机|计院|86分|\d{2,3}分)$/.test(trimmed) ||
-    trimmed.length <= 12
+    /^(20\d{2}|大一|大二|高等数学[一二三上下]?|数学分析|医科数学|计算机学院|计算机|计院|86分|\d{2,3}分)$/.test(
+      trimmed,
+    ) || trimmed.length <= 12
   )
 }
 
@@ -388,13 +397,12 @@ function mergeSupplementQuestion(previousQuestion: string, supplement: string): 
   return `原问题：${originalQuestion}\n补充信息：${mergedSupplement}`
 }
 
-function buildEffectiveQuestion(
-  currentInput: string,
-  session: StoredSession,
-): EffectiveTurn {
+function buildEffectiveQuestion(currentInput: string, session: StoredSession): EffectiveTurn {
   const trimmed = currentInput.trim()
   const previousUser = [...session.history].reverse().find((message) => message.role === "user")
-  const lastAssistant = [...session.history].reverse().find((message) => message.role === "assistant")
+  const lastAssistant = [...session.history]
+    .reverse()
+    .find((message) => message.role === "assistant")
 
   if (
     previousUser &&
@@ -424,7 +432,9 @@ function buildRollingSummary(session: StoredSession): string {
   const facts = [
     session.profile.academies.length > 0 ? `关注学院：${session.profile.academies.join("、")}` : "",
     session.profile.years.length > 0 ? `关注年份：${session.profile.years.join("、")}` : "",
-    session.profile.topics.length > 0 ? `关注问题：${session.profile.topics.slice(0, 5).join("、")}` : "",
+    session.profile.topics.length > 0
+      ? `关注问题：${session.profile.topics.slice(0, 5).join("、")}`
+      : "",
   ].filter(Boolean)
 
   const recent = session.history.length > 0 ? recentConversationSummary(session.history, 4) : ""
@@ -473,7 +483,8 @@ function normalizeContextualizedPlan(
 
   return {
     ...normalizedPlan,
-    standaloneQuestion: standaloneQuestion.length >= 2 ? standaloneQuestion : fallback.standaloneQuestion,
+    standaloneQuestion:
+      standaloneQuestion.length >= 2 ? standaloneQuestion : fallback.standaloneQuestion,
     rollingSummary: rollingSummary || fallback.rollingSummary,
   }
 }
@@ -492,10 +503,14 @@ function normalizeChatEndpoint(apiBase: string): string {
     throw new Error("聊天模型未配置，请在构建时注入 CHATBOT_API_BASE 和 CHATBOT_MODEL。")
   }
   if (isMixedContentRequest(trimmed)) {
-    throw new Error("当前站点通过 HTTPS 打开，CHATBOT_API_BASE 不能使用 http:// 地址，否则浏览器会拦截混合内容请求。")
+    throw new Error(
+      "当前站点通过 HTTPS 打开，CHATBOT_API_BASE 不能使用 http:// 地址，否则浏览器会拦截混合内容请求。",
+    )
   }
 
-  const rawEndpoint = trimmed.endsWith("/chat/completions") ? trimmed : `${trimmed}/chat/completions`
+  const rawEndpoint = trimmed.endsWith("/chat/completions")
+    ? trimmed
+    : `${trimmed}/chat/completions`
 
   try {
     return new URL(rawEndpoint).toString()
@@ -601,7 +616,10 @@ function maxYear(years: string[]): number {
 }
 
 function normalizeEntityName(input: string): string {
-  return input.replace(/[()（）]/g, " ").replace(/\s+/g, " ").trim()
+  return input
+    .replace(/[()（）]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
 }
 
 function collectAliases(name: string): string[] {
@@ -610,7 +628,10 @@ function collectAliases(name: string): string[] {
   aliases.add(cleaned.replace(/学院|学部|系$/g, "").trim())
   aliases.add(cleaned.replace(/\s+/g, ""))
 
-  const manual = [...(MANUAL_ALIAS_OVERRIDES[cleaned] ?? []), ...(MANUAL_ALIAS_OVERRIDES_ZH[cleaned] ?? [])]
+  const manual = [
+    ...(MANUAL_ALIAS_OVERRIDES[cleaned] ?? []),
+    ...(MANUAL_ALIAS_OVERRIDES_ZH[cleaned] ?? []),
+  ]
   for (const alias of manual) {
     aliases.add(alias)
   }
@@ -750,7 +771,9 @@ function buildKnowledgeBase(data: ContentIndex): KnowledgeBase {
   const academyAliases = new Map<string, string[]>()
   const tokenDocumentFrequency = new Map<string, number>()
 
-  for (const [slug, doc] of Object.entries<ContentDetails>(data) as Array<[FullSlug, ContentDetails]>) {
+  for (const [slug, doc] of Object.entries<ContentDetails>(data) as Array<
+    [FullSlug, ContentDetails]
+  >) {
     const title = doc.title ?? slug
     const metadata = normalizeDocumentMetadata((doc as ContentDocument).metadata)
     const sourceType = resolveSourceType(slug, metadata)
@@ -882,9 +905,7 @@ function detectAcademiesFromQuestion(question: string, knowledgeBase: KnowledgeB
   }
 
   return unique(
-    hits
-      .sort((a, b) => b.alias.length - a.alias.length)
-      .map((item) => item.academy),
+    hits.sort((a, b) => b.alias.length - a.alias.length).map((item) => item.academy),
   ).slice(0, 4)
 }
 
@@ -900,13 +921,16 @@ function heuristicPlan(
       : session.profile.academies.slice(0, 2)
   const years = extractYears(question)
   const intent = heuristicIntent(question)
-  const compareMode = /比较|对比|区别|哪个好|哪家|谁更/.test(question) || fallbackAcademies.length > 1
+  const compareMode =
+    /比较|对比|区别|哪个好|哪家|谁更/.test(question) || fallbackAcademies.length > 1
   const preferLatest =
     /最新|当前|现在|今年|近年|最近/.test(question) ||
     (years.length === 0 && ["policy", "eligibility", "process", "timeline"].includes(intent))
   const needClarification =
     fallbackAcademies.length === 0 &&
-    (intent === "academy_info" || intent === "academy_compare" || /哪个学院|哪个专业/.test(question))
+    (intent === "academy_info" ||
+      intent === "academy_compare" ||
+      /哪个学院|哪个专业/.test(question))
 
   return {
     intent,
@@ -928,12 +952,12 @@ function heuristicPlan(
     ).slice(0, 6),
     preferredSourceTypes:
       session.profile.preferredSourceTypes.length > 0
-        ? unique([
+        ? (unique([
             ...defaultPreferredSourceTypes(intent),
             ...session.profile.preferredSourceTypes,
-          ]).slice(0, 5) as SourceType[]
+          ]).slice(0, 5) as SourceType[])
         : defaultPreferredSourceTypes(intent),
-    }
+  }
 }
 
 function idf(token: string, knowledgeBase: KnowledgeBase): number {
@@ -952,13 +976,7 @@ function scoreChunk(
   let score = 0
   const queryTokens = unique(
     tokenize(
-      [
-        question,
-        ...plan.queryVariants,
-        ...plan.topics,
-        ...plan.academies,
-        ...plan.years,
-      ].join(" "),
+      [question, ...plan.queryVariants, ...plan.topics, ...plan.academies, ...plan.years].join(" "),
     ),
   )
 
@@ -993,13 +1011,20 @@ function scoreChunk(
     if (overlapYears.length > 0) {
       score += 9 + overlapYears.length * 2
       reasons.push(`年份匹配 ${overlapYears.join("、")}`)
-    } else if (chunk.years.length > 0 && ["policy", "eligibility", "timeline"].includes(plan.intent)) {
+    } else if (
+      chunk.years.length > 0 &&
+      ["policy", "eligibility", "timeline"].includes(plan.intent)
+    ) {
       score -= 4
     }
   } else if (plan.preferLatest) {
     if (chunk.maxYear > 0) {
-      const recencyWeight = ["policy", "eligibility", "process", "timeline"].includes(plan.intent) ? 2.1 : 1.2
-      const recencyCap = ["policy", "eligibility", "process", "timeline"].includes(plan.intent) ? 11 : 6
+      const recencyWeight = ["policy", "eligibility", "process", "timeline"].includes(plan.intent)
+        ? 2.1
+        : 1.2
+      const recencyCap = ["policy", "eligibility", "process", "timeline"].includes(plan.intent)
+        ? 11
+        : 6
       score += clamp((chunk.maxYear - 2021) * recencyWeight, 0, recencyCap)
       reasons.push(`preferLatest ${chunk.maxYear}`)
     } else if (
@@ -1095,7 +1120,10 @@ function sanitizeConflicts(conflicts: string[]): string[] {
     conflicts
       .map((conflict) => stripMarkupNoise(conflict).replace(/\s+/g, " ").trim())
       .filter((conflict) => conflict.length >= 8)
-      .filter((conflict) => !/[A-Za-z0-9\u4e00-\u9fff_-]+\/[A-Za-z0-9\u4e00-\u9fff_-]+#\d+/.test(conflict))
+      .filter(
+        (conflict) =>
+          !/[A-Za-z0-9\u4e00-\u9fff_-]+\/[A-Za-z0-9\u4e00-\u9fff_-]+#\d+/.test(conflict),
+      )
       .filter((conflict) => !/^无[。.]?$/.test(conflict)),
   ).slice(0, 5)
 }
@@ -1104,7 +1132,11 @@ function questionFacets(question: string, plan: PlannerResult): EvidenceFacet[] 
   const normalized = question.toLowerCase()
   const facets: EvidenceFacet[] = []
 
-  if (/要求|条件|资格|门槛|绩点|gpa|平均分|均分|课程|限制|能不能|可不可以|院内|申请前提/.test(normalized)) {
+  if (
+    /要求|条件|资格|门槛|绩点|gpa|平均分|均分|课程|限制|能不能|可不可以|院内|申请前提/.test(
+      normalized,
+    )
+  ) {
     facets.push("eligibility")
   }
   if (/怎么考|考什么|考核|初试|笔试|机试|面试|复试|总成绩|双随机|准备|备考/.test(normalized)) {
@@ -1156,7 +1188,18 @@ function facetTerms(facet: EvidenceFacet): string[] {
     case "eligibility":
       return ["要求", "条件", "资格", "课程", "平均分", "均分", "绩点", "限制", "不能", "不接受"]
     case "exam":
-      return ["考核", "初试", "笔试", "机试", "面试", "总成绩", "双随机", "程序设计", "高等数学", "备考"]
+      return [
+        "考核",
+        "初试",
+        "笔试",
+        "机试",
+        "面试",
+        "总成绩",
+        "双随机",
+        "程序设计",
+        "高等数学",
+        "备考",
+      ]
     case "process":
       return ["流程", "步骤", "申请", "报名", "提交", "审核", "录取", "公示", "名单"]
     case "timeline":
@@ -1187,7 +1230,8 @@ function scoreTextAgainstFacet(text: string, facet: EvidenceFacet): number {
 }
 
 function scoreFacetCoverage(chunk: KnowledgeChunk, facet: EvidenceFacet): number {
-  let score = scoreTextAgainstFacet(chunk.title, facet) * 1.6 + scoreTextAgainstFacet(chunk.content, facet)
+  let score =
+    scoreTextAgainstFacet(chunk.title, facet) * 1.6 + scoreTextAgainstFacet(chunk.content, facet)
 
   if (facet !== "general" && chunk.sourceType === "official_policy") {
     score += 2
@@ -1236,11 +1280,14 @@ function facetAwareApprovalIds(
     }
   }
 
-  const needsOfficial = ["policy", "eligibility", "process", "timeline", "exam"].includes(plan.intent)
+  const needsOfficial = ["policy", "eligibility", "process", "timeline", "exam"].includes(
+    plan.intent,
+  )
   if (
     needsOfficial &&
     !picked.some(
-      (id) => retrieved.find((item) => item.chunk.id === id)?.chunk.sourceType === "official_policy",
+      (id) =>
+        retrieved.find((item) => item.chunk.id === id)?.chunk.sourceType === "official_policy",
     )
   ) {
     const official = ranked.find((item) => item.chunk.sourceType === "official_policy")
@@ -1281,7 +1328,10 @@ function facetLabel(facet: EvidenceFacet): string {
   }
 }
 
-function approvedChunksFromIds(approvedIds: string[], retrieved: RetrievedChunk[]): KnowledgeChunk[] {
+function approvedChunksFromIds(
+  approvedIds: string[],
+  retrieved: RetrievedChunk[],
+): KnowledgeChunk[] {
   return approvedIds
     .map((id) => retrieved.find((item) => item.chunk.id === id)?.chunk)
     .filter((chunk): chunk is KnowledgeChunk => Boolean(chunk))
@@ -1350,7 +1400,9 @@ function deriveRejectedIds(
   const approvedSet = new Set(approvedIds)
   const facets = questionFacets(question, plan)
   const approvedChunks = approvedChunksFromIds(approvedIds, retrieved)
-  const needsOfficial = ["policy", "eligibility", "process", "timeline", "exam"].includes(plan.intent)
+  const needsOfficial = ["policy", "eligibility", "process", "timeline", "exam"].includes(
+    plan.intent,
+  )
   const hasApprovedOfficial = approvedChunks.some(isOfficialChunk)
   const newestApprovedByGroup = new Map<string, number>()
 
@@ -1367,7 +1419,12 @@ function deriveRejectedIds(
         return true
       }
 
-      if (needsOfficial && hasApprovedOfficial && plan.intent !== "exam" && !isOfficialChunk(item.chunk)) {
+      if (
+        needsOfficial &&
+        hasApprovedOfficial &&
+        plan.intent !== "exam" &&
+        !isOfficialChunk(item.chunk)
+      ) {
         return true
       }
 
@@ -1397,7 +1454,11 @@ function deriveReviewConfidence(
     approvedChunks.some((chunk) => scoreFacetCoverage(chunk, facet) >= 3),
   )
 
-  if (coveredFacets.length === facets.length && !missingOfficialEvidence && conflicts.length === 0) {
+  if (
+    coveredFacets.length === facets.length &&
+    !missingOfficialEvidence &&
+    conflicts.length === 0
+  ) {
     return "high"
   }
 
@@ -1497,7 +1558,11 @@ function resolveAcademyName(candidate: string, knowledgeBase: KnowledgeBase): st
   }
 
   for (const [academy, aliases] of knowledgeBase.academyAliases.entries()) {
-    if (aliases.some((alias) => alias === normalized || alias.includes(normalized) || normalized.includes(alias))) {
+    if (
+      aliases.some(
+        (alias) => alias === normalized || alias.includes(normalized) || normalized.includes(alias),
+      )
+    ) {
       return academy
     }
   }
@@ -1513,7 +1578,10 @@ function normalizeSourceTypes(raw: unknown, fallback: SourceType[]): SourceType[
       )
     : []
 
-  return unique([...(requested.length > 0 ? requested : fallback), ...fallback]).slice(0, 5) as SourceType[]
+  return unique([...(requested.length > 0 ? requested : fallback), ...fallback]).slice(
+    0,
+    5,
+  ) as SourceType[]
 }
 
 function normalizePlannerResult(
@@ -1528,15 +1596,19 @@ function normalizePlannerResult(
       : fallback.intent
 
   const academies = unique([
-    ...((Array.isArray(candidate.academies) ? candidate.academies : [])
-      .map((academy) => (typeof academy === "string" ? resolveAcademyName(academy, knowledgeBase) : null))
-      .filter((academy): academy is string => Boolean(academy))),
+    ...(Array.isArray(candidate.academies) ? candidate.academies : [])
+      .map((academy) =>
+        typeof academy === "string" ? resolveAcademyName(academy, knowledgeBase) : null,
+      )
+      .filter((academy): academy is string => Boolean(academy)),
     ...fallback.academies,
   ]).slice(0, 4)
 
   const years = unique([
     ...(Array.isArray(candidate.years)
-      ? candidate.years.filter((year): year is string => typeof year === "string" && /^20\d{2}$/.test(year))
+      ? candidate.years.filter(
+          (year): year is string => typeof year === "string" && /^20\d{2}$/.test(year),
+        )
       : []),
     ...fallback.years,
   ]).sort((a, b) => Number(b) - Number(a))
@@ -1578,7 +1650,10 @@ function normalizePlannerResult(
 
   const preferredSourceTypes = normalizeSourceTypes(
     candidate.preferredSourceTypes,
-    unique([...defaultPreferredSourceTypes(intent), ...fallback.preferredSourceTypes]).slice(0, 5) as SourceType[],
+    unique([...defaultPreferredSourceTypes(intent), ...fallback.preferredSourceTypes]).slice(
+      0,
+      5,
+    ) as SourceType[],
   )
 
   return {
@@ -1603,11 +1678,17 @@ function plannerFallback(
   return heuristicPlan(question, session, knowledgeBase)
 }
 
-function reviewerFallback(question: string, plan: PlannerResult, retrieved: RetrievedChunk[]): ReviewResult {
+function reviewerFallback(
+  question: string,
+  plan: PlannerResult,
+  retrieved: RetrievedChunk[],
+): ReviewResult {
   const approvedIds = facetAwareApprovalIds(question, plan, retrieved)
   const approvedChunks = approvedChunksFromIds(approvedIds, retrieved)
   const hasOfficial = approvedChunks.some(isOfficialChunk)
-  const needsOfficial = ["policy", "eligibility", "process", "timeline", "exam"].includes(plan.intent)
+  const needsOfficial = ["policy", "eligibility", "process", "timeline", "exam"].includes(
+    plan.intent,
+  )
   const missingOfficialEvidence = needsOfficial && !hasOfficial
   const conflicts = detectEvidenceConflicts(question, plan, retrieved, approvedIds)
   const rejectedIds = deriveRejectedIds(question, plan, retrieved, approvedIds)
@@ -1640,22 +1721,25 @@ function normalizeReviewResult(
   const validIds = new Set(retrieved.map((item) => item.chunk.id))
 
   const approvedIds = unique([
-    ...((Array.isArray(candidate.approvedIds) ? candidate.approvedIds : []).filter(
+    ...(Array.isArray(candidate.approvedIds) ? candidate.approvedIds : []).filter(
       (id): id is string => typeof id === "string" && validIds.has(id),
-    )),
+    ),
     ...fallback.approvedIds,
   ]).slice(0, MAX_APPROVED)
 
   const rejectedIds = Array.isArray(candidate.rejectedIds)
     ? candidate.rejectedIds.filter(
-        (id): id is string => typeof id === "string" && validIds.has(id) && !approvedIds.includes(id),
+        (id): id is string =>
+          typeof id === "string" && validIds.has(id) && !approvedIds.includes(id),
       )
     : fallback.rejectedIds
 
   const approvedChunks = approvedChunksFromIds(approvedIds, retrieved)
 
   const hasOfficial = approvedChunks.some(isOfficialChunk)
-  const needsOfficial = ["policy", "eligibility", "process", "timeline", "exam"].includes(plan.intent)
+  const needsOfficial = ["policy", "eligibility", "process", "timeline", "exam"].includes(
+    plan.intent,
+  )
   const missingOfficialEvidence = needsOfficial && !hasOfficial
   const fallbackConflicts = fallback.conflicts
 
@@ -1708,7 +1792,19 @@ function splitCandidateSentences(text: string): string[] {
 function intentTerms(plan: PlannerResult): string[] {
   switch (plan.intent) {
     case "exam":
-      return ["考核", "初试", "笔试", "机试", "面试", "备考", "复习", "高数", "程序设计", "双随机", "总成绩"]
+      return [
+        "考核",
+        "初试",
+        "笔试",
+        "机试",
+        "面试",
+        "备考",
+        "复习",
+        "高数",
+        "程序设计",
+        "双随机",
+        "总成绩",
+      ]
     case "eligibility":
       return ["要求", "条件", "资格", "绩点", "排名", "申请", "不得", "不能", "降级"]
     case "process":
@@ -1725,7 +1821,12 @@ function intentTerms(plan: PlannerResult): string[] {
   }
 }
 
-function scoreCandidateSentence(sentence: string, question: string, plan: PlannerResult, chunk: KnowledgeChunk): number {
+function scoreCandidateSentence(
+  sentence: string,
+  question: string,
+  plan: PlannerResult,
+  chunk: KnowledgeChunk,
+): number {
   const normalizedSentence = normalizeText(sentence)
   if (!normalizedSentence) return 0
 
@@ -1857,7 +1958,9 @@ function fallbackSummaryLines(
   const lines: string[] = []
 
   if (plan.intent === "exam") {
-    const official = evidenceWithExcerpt.filter(({ item }) => item.chunk.sourceType === "official_policy")
+    const official = evidenceWithExcerpt.filter(
+      ({ item }) => item.chunk.sourceType === "official_policy",
+    )
     const withInterview = official.filter(({ excerpt }) => /面试/.test(excerpt))
     const withWritten = official.filter(({ excerpt }) => /初试|笔试|机试/.test(excerpt))
     const withThreshold = official.filter(({ excerpt }) =>
@@ -1872,9 +1975,13 @@ function fallbackSummaryLines(
         `- 从 ${formatEvidenceYears([...withInterview, ...withWritten])} 命中的官方细则看，考核不是只看单一环节，而是“初试/笔试/机试 + 面试”或先初试后面试，面试会实际计入录取。${collectEvidenceLabels([...withInterview, ...withWritten])}`,
       )
     } else if (withInterview.length > 0) {
-      lines.push(`- 当前命中的资料里明确出现了面试环节，所以不能按“只准备笔试”来理解。${collectEvidenceLabels(withInterview)}`)
+      lines.push(
+        `- 当前命中的资料里明确出现了面试环节，所以不能按“只准备笔试”来理解。${collectEvidenceLabels(withInterview)}`,
+      )
     } else if (withWritten.length > 0) {
-      lines.push(`- 当前命中的资料里明确出现了初试/笔试/机试环节，至少不能把考核理解成“纯面试”。${collectEvidenceLabels(withWritten)}`)
+      lines.push(
+        `- 当前命中的资料里明确出现了初试/笔试/机试环节，至少不能把考核理解成“纯面试”。${collectEvidenceLabels(withWritten)}`,
+      )
     }
 
     if (withThreshold.length > 0) {
@@ -1894,9 +2001,9 @@ function fallbackSummaryLines(
     return lines.slice(0, 3)
   }
 
-  return evidenceWithExcerpt.slice(0, 3).map(
-    ({ item, excerpt }) => `- ${item.chunk.title}：${excerpt}[${item.label}]`,
-  )
+  return evidenceWithExcerpt
+    .slice(0, 3)
+    .map(({ item, excerpt }) => `- ${item.chunk.title}：${excerpt}[${item.label}]`)
 }
 
 function fallbackAnswer(
@@ -2001,14 +2108,17 @@ function renderInlineMarkdown(text: string): string {
 function markdownToHtml(markdown: string): string {
   const normalized = markdown.replace(/\r/g, "")
   const codeBlocks: string[] = []
-  const protectedMarkdown = normalized.replace(/```([\w-]*)\n([\s\S]*?)```/g, (_match, lang, code) => {
-    const placeholder = `@@CODE_BLOCK_${codeBlocks.length}@@`
-    const block = `<pre><code class="language-${escapeHtml(String(lang || "text"))}">${escapeHtml(
-      String(code).trim(),
-    )}</code></pre>`
-    codeBlocks.push(block)
-    return placeholder
-  })
+  const protectedMarkdown = normalized.replace(
+    /```([\w-]*)\n([\s\S]*?)```/g,
+    (_match, lang, code) => {
+      const placeholder = `@@CODE_BLOCK_${codeBlocks.length}@@`
+      const block = `<pre><code class="language-${escapeHtml(String(lang || "text"))}">${escapeHtml(
+        String(code).trim(),
+      )}</code></pre>`
+      codeBlocks.push(block)
+      return placeholder
+    },
+  )
 
   const lines = protectedMarkdown.split("\n")
   const htmlParts: string[] = []
@@ -2098,18 +2208,23 @@ function assistantHtml(message: StoredMessage, currentSlug: FullSlug): string {
       : (() => {
           const dedupedCitations = unique(normalizedCitations.map((citation) => citation.label))
             .map((label) => normalizedCitations.find((citation) => citation.label === label))
-            .filter((citation): citation is StoredCitation & { label: string } => Boolean(citation?.label))
+            .filter((citation): citation is StoredCitation & { label: string } =>
+              Boolean(citation?.label),
+            )
 
           return `<h4>参考依据</h4><ul>${dedupedCitations
-          .map((citation) => {
-            const href = new URL(resolveRelative(currentSlug, citation.slug), location.toString()).toString()
-            const yearLabel = citation.years.length > 0 ? ` · ${citation.years.join("、")}` : ""
-            const academyLabel = citation.academy ? ` · ${citation.academy}` : ""
-            return `<li class="chatbot-li">[${citation.label}] <a href="${href}">${escapeHtml(
-              citation.title,
-            )}</a> · ${SOURCE_LABELS[citation.sourceType]}${academyLabel}${yearLabel}</li>`
-          })
-          .join("")}</ul>`
+            .map((citation) => {
+              const href = new URL(
+                resolveRelative(currentSlug, citation.slug),
+                location.toString(),
+              ).toString()
+              const yearLabel = citation.years.length > 0 ? ` · ${citation.years.join("、")}` : ""
+              const academyLabel = citation.academy ? ` · ${citation.academy}` : ""
+              return `<li class="chatbot-li">[${citation.label}] <a href="${href}">${escapeHtml(
+                citation.title,
+              )}</a> · ${SOURCE_LABELS[citation.sourceType]}${academyLabel}${yearLabel}</li>`
+            })
+            .join("")}</ul>`
         })()
 
   return `${body}${notesHtml}${citationsHtml}`
@@ -2243,7 +2358,9 @@ class ChatbotRuntime {
     window.addCleanup(() => this.sendButton?.removeEventListener("click", onSend))
     window.addCleanup(() => this.clearButton?.removeEventListener("click", onClear))
 
-    const presetButtons = Array.from(this.root.querySelectorAll<HTMLButtonElement>(".chatbot-preset-btn"))
+    const presetButtons = Array.from(
+      this.root.querySelectorAll<HTMLButtonElement>(".chatbot-preset-btn"),
+    )
     presetButtons.forEach((button) => {
       const onPreset = () => {
         const question = button.dataset.question?.trim()
@@ -2265,14 +2382,18 @@ class ChatbotRuntime {
     this.persistSession()
 
     if (!this.messagesEl) return
-    Array.from(this.messagesEl.querySelectorAll(".chatbot-msg")).forEach((element) => element.remove())
+    Array.from(this.messagesEl.querySelectorAll(".chatbot-msg")).forEach((element) =>
+      element.remove(),
+    )
     this.syncWelcomeState()
     this.scrollToBottom()
   }
 
   private renderHistory() {
     if (!this.messagesEl) return
-    Array.from(this.messagesEl.querySelectorAll(".chatbot-msg")).forEach((element) => element.remove())
+    Array.from(this.messagesEl.querySelectorAll(".chatbot-msg")).forEach((element) =>
+      element.remove(),
+    )
     const currentSlug = getFullSlug(window)
     for (const message of this.session.history) {
       if (message.role === "assistant") {
@@ -2305,19 +2426,20 @@ class ChatbotRuntime {
         : `chatbot-msg chatbot-msg-${role === "assistant" ? "assistant" : "user"}`
 
     const bubble = document.createElement("div")
-    bubble.className =
-      role === "error" ? "chatbot-bubble chatbot-bubble-error" : "chatbot-bubble"
+    bubble.className = role === "error" ? "chatbot-bubble chatbot-bubble-error" : "chatbot-bubble"
     bubble.innerHTML = html
 
     if (role === "assistant") {
       const avatar = document.createElement("div")
       avatar.className = "chatbot-msg-avatar"
-      avatar.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"></path></svg>'
+      avatar.innerHTML =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" width="18" height="18"><path d="M12 15.5c0-2.2 1.8-4 4-4h21v25H16c-2.2 0-4-1.8-4-4v-17Z" fill="currentColor" opacity="0.16"></path><path d="M12 14c0-2.2 1.8-4 4-4h20v25H16c-2.2 0-4-1.8-4-4V14Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"></path><path d="M18 17h12M18 24h9M36 10v25M12 31c0-2.2 1.8-4 4-4h20" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path><path d="M9 8l2.1 3.9L15 14l-3.9 2.1L9 20l-2.1-3.9L3 14l3.9-2.1L9 8Z" fill="currentColor"></path></svg>'
       row.appendChild(avatar)
     } else if (role === "user") {
       const avatar = document.createElement("div")
       avatar.className = "chatbot-msg-avatar"
-      avatar.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>'
+      avatar.innerHTML =
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>'
       row.appendChild(avatar)
     }
 
@@ -2425,12 +2547,12 @@ class ChatbotRuntime {
         return
       }
 
-      const retrieved = retrieveChunks(contextualized.standaloneQuestion, contextualized, knowledgeBase)
-      const review = await this.review(
+      const retrieved = retrieveChunks(
         contextualized.standaloneQuestion,
         contextualized,
-        retrieved,
+        knowledgeBase,
       )
+      const review = await this.review(contextualized.standaloneQuestion, contextualized, retrieved)
       const approved = this.materializeEvidence(review, retrieved)
       const answerText = await this.answer(
         contextualized.standaloneQuestion,
@@ -2468,8 +2590,7 @@ class ChatbotRuntime {
     } catch (error) {
       this.removeTyping()
       if (!isAbortError(error)) {
-        const message =
-          error instanceof Error ? error.message : "聊天请求失败，请稍后再试。"
+        const message = error instanceof Error ? error.message : "聊天请求失败，请稍后再试。"
         this.appendMessage("error", `<p>${escapeHtml(message)}</p>`)
       }
     } finally {
@@ -2587,7 +2708,12 @@ class ChatbotRuntime {
     plan: PlannerResult,
     retrieved: RetrievedChunk[],
   ): Promise<ReviewResult> {
-    return normalizeReviewResult(reviewerFallback(question, plan, retrieved), question, plan, retrieved)
+    return normalizeReviewResult(
+      reviewerFallback(question, plan, retrieved),
+      question,
+      plan,
+      retrieved,
+    )
   }
 
   private async answer(
@@ -2706,7 +2832,9 @@ class ChatbotRuntime {
     } catch (error) {
       if (isAbortError(error)) throw error
       if (error instanceof TypeError) {
-        throw new Error("模型接口请求失败。请检查接口是否支持浏览器 CORS、是否为 HTTPS 地址，以及当前网络是否可达。")
+        throw new Error(
+          "模型接口请求失败。请检查接口是否支持浏览器 CORS、是否为 HTTPS 地址，以及当前网络是否可达。",
+        )
       }
       throw error
     }

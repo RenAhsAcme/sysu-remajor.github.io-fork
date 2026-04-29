@@ -44,7 +44,9 @@ body[data-slug="chatbot"] {
     var(--light) 12rem
   );
   box-shadow: 0 6px 18px rgba(43, 43, 43, 0.022);
-  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  transition:
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
 
   &:hover {
     border-color: color-mix(in srgb, var(--lightgray) 88%, transparent);
@@ -222,9 +224,9 @@ body[data-slug="chatbot"] {
 }
 
 .chatbot-msg-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -234,18 +236,18 @@ body[data-slug="chatbot"] {
   border: 1px solid color-mix(in srgb, var(--lightgray) 72%, transparent);
 }
 
-/* User avatar is different now */
 .chatbot-msg-user .chatbot-msg-avatar {
-  background: color-mix(in srgb, var(--gray) 88%, var(--darkgray));
+  background: color-mix(in srgb, var(--darkgray) 78%, var(--gray));
 }
 
 .chatbot-msg-assistant .chatbot-msg-avatar {
   background: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--secondary) 88%, var(--light)) 0%,
-    color-mix(in srgb, var(--tertiary) 72%, var(--secondary)) 100%
+    color-mix(in srgb, var(--secondary) 92%, #0f766e) 0%,
+    color-mix(in srgb, var(--tertiary) 82%, var(--secondary)) 100%
   );
-  border-color: color-mix(in srgb, var(--secondary) 18%, transparent);
+  border-color: color-mix(in srgb, var(--secondary) 22%, transparent);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--secondary) 14%, transparent);
 }
 
 .chatbot-bubble {
@@ -277,7 +279,8 @@ body[data-slug="chatbot"] {
   }
 
   // Markdown content styles
-  h3, h4 {
+  h3,
+  h4 {
     font-family: var(--headerFont);
     color: var(--dark);
     margin: 1rem 0 0.5rem;
@@ -345,17 +348,23 @@ body[data-slug="chatbot"] {
   }
 
   .chatbot-msg-user & {
-    background: color-mix(in srgb, var(--highlight) 82%, var(--light));
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--secondary) 12%, var(--highlight)),
+      color-mix(in srgb, var(--highlight) 82%, var(--light))
+    );
     color: var(--dark);
-    border: 1px solid color-mix(in srgb, var(--lightgray) 72%, transparent);
-    border-top-right-radius: 6px;
+    border: 1px solid color-mix(in srgb, var(--secondary) 14%, var(--lightgray));
+    border-top-right-radius: 7px;
+    box-shadow: 0 8px 22px rgba(43, 43, 43, 0.025);
   }
 
   .chatbot-msg-assistant & {
-    background: color-mix(in srgb, var(--highlight) 18%, var(--light));
+    background: color-mix(in srgb, var(--light) 92%, transparent);
     color: var(--dark);
-    border: 1px solid color-mix(in srgb, var(--lightgray) 72%, transparent);
-    border-top-left-radius: 6px;
+    border: 1px solid color-mix(in srgb, var(--lightgray) 68%, transparent);
+    border-top-left-radius: 7px;
+    box-shadow: 0 10px 26px rgba(43, 43, 43, 0.032);
   }
 
   &.chatbot-bubble-error {
@@ -395,8 +404,9 @@ body[data-slug="chatbot"] {
 // --- Input Area ---
 .chatbot-input-area {
   padding: 1rem 1.25rem 1.1rem;
-  background: color-mix(in srgb, var(--light) 96%, var(--highlight));
-  border-top: 1px solid color-mix(in srgb, var(--lightgray) 75%, transparent);
+  background: color-mix(in srgb, var(--light) 88%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--lightgray) 62%, transparent);
+  backdrop-filter: blur(12px);
 
   @media all and ($mobile) {
     padding: 0.8rem 1rem;
@@ -405,19 +415,23 @@ body[data-slug="chatbot"] {
 
 .chatbot-input-wrapper {
   display: flex;
-  background: color-mix(in srgb, var(--highlight) 10%, var(--light));
-  border: 1px solid color-mix(in srgb, var(--lightgray) 84%, transparent);
-  border-radius: 16px;
+  background: var(--light);
+  border: 1px solid color-mix(in srgb, var(--lightgray) 78%, transparent);
+  border-radius: 18px;
   max-width: 820px;
   margin: 0 auto;
   padding: 0.35rem;
   position: relative;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 14px rgba(43, 43, 43, 0.02);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+  box-shadow: 0 12px 32px rgba(43, 43, 43, 0.05);
 
   &:focus-within {
-    border-color: color-mix(in srgb, var(--secondary) 28%, var(--lightgray));
-    box-shadow: 0 6px 18px color-mix(in srgb, var(--secondary) 8%, transparent);
+    transform: translateY(-1px);
+    border-color: color-mix(in srgb, var(--secondary) 36%, var(--lightgray));
+    box-shadow: 0 16px 36px color-mix(in srgb, var(--secondary) 10%, rgba(43, 43, 43, 0.06));
   }
 }
 
@@ -455,7 +469,7 @@ body[data-slug="chatbot"] {
 .chatbot-send {
   width: 38px;
   height: 38px;
-  border-radius: 12px;
+  border-radius: 13px;
   border: none;
   display: flex;
   align-items: center;
@@ -472,12 +486,12 @@ body[data-slug="chatbot"] {
 .chatbot-clear {
   background: transparent;
   color: var(--gray);
-  
+
   &:hover {
     color: var(--dark);
     background: color-mix(in srgb, var(--highlight) 75%, var(--light));
   }
-  
+
   &.stop-active {
     background: color-mix(in srgb, var(--secondary) 10%, transparent);
     color: var(--secondary);
@@ -489,15 +503,19 @@ body[data-slug="chatbot"] {
 }
 
 .chatbot-send {
-  background: color-mix(in srgb, var(--lightgray) 82%, var(--light));
+  background: color-mix(in srgb, var(--secondary) 10%, var(--lightgray));
   color: var(--gray);
-  
+
   &.active,
   &:hover {
-    background: var(--secondary);
+    background: linear-gradient(
+      135deg,
+      var(--secondary),
+      color-mix(in srgb, var(--tertiary) 82%, var(--secondary))
+    );
     color: white;
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px color-mix(in srgb, var(--secondary) 14%, transparent);
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--secondary) 18%, transparent);
   }
 
   &:active {
